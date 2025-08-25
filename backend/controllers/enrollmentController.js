@@ -1,5 +1,6 @@
 const User = require('../Models/User');
 const Course = require('../Models/Course');
+const { sendEmail } = require('../config/email');
 
 exports.enrollCourse = async (req, res) => {
   try {
@@ -16,6 +17,9 @@ exports.enrollCourse = async (req, res) => {
 
     user.enrolledCourses.push(courseId);
     await user.save();
+
+    // Send enrollment confirmation email
+    await sendEmail(user.email, 'enrollment', [user.name, course.title]);
 
     res.json({ msg: 'Enrolled successfully' });
   } catch (err) {

@@ -42,7 +42,7 @@ const Login = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Set auth token (in a real app, this would come from the API)
-      authService.setToken('mock-jwt-token');
+      authService.setAuthToken('mock-jwt-token');
       
       dispatch(loginSuccess(mockUserData));
       toast.success('Login successful!');

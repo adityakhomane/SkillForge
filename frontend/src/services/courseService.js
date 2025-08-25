@@ -1,7 +1,8 @@
 import axios from 'axios';
+import API_CONFIG from '../config/api';
 
-// API URL would typically come from environment variables
-const API_URL = '/api/courses';
+// Use the configured API URL
+const API_URL = `${API_CONFIG.BASE_URL}/courses`;
 
 const courseService = {
   // Get all courses

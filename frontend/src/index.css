@@ -38,6 +38,17 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+/* Logout button styles */
+.logout-button {
+  background-color: #ff4757; /* Red color */
+  color: #ff4757(255, 255, 255);
+  padding: 0.8em 1.5em; /* Increased padding */
+  font-size: 1.1em; /* Larger font size */
+  border-radius: 10px; /* Slightly larger border radius */
+}
+.logout-button:hover {
+  background-color: #e84118; /* Darker red on hover */
+}
 button:hover {
   border-color: #646cff;
 }
