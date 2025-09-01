@@ -1,6 +1,6 @@
-const Lesson = require('../Models/Lesson');
+import Lesson from '../Models/Lesson.js';
 
-exports.createLesson = async (req, res) => {
+export const createLesson = async (req, res) => {
   try {
     const { title, videoUrl, duration, courseId } = req.body;
     const lesson = new Lesson({ title, videoUrl, duration, courseId });
@@ -12,7 +12,7 @@ exports.createLesson = async (req, res) => {
   }
 };
 
-exports.getLessonsByCourse = async (req, res) => {
+export const getLessonsByCourse = async (req, res) => {
   try {
     const lessons = await Lesson.find({ courseId: req.params.courseId });
     res.json(lessons);
@@ -22,7 +22,7 @@ exports.getLessonsByCourse = async (req, res) => {
   }
 };
 
-exports.updateLesson = async (req, res) => {
+export const updateLesson = async (req, res) => {
   try {
     const lesson = await Lesson.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!lesson) return res.status(404).json({ msg: 'Lesson not found' });
@@ -33,7 +33,7 @@ exports.updateLesson = async (req, res) => {
   }
 };
 
-exports.deleteLesson = async (req, res) => {
+export const deleteLesson = async (req, res) => {
   try {
     const lesson = await Lesson.findByIdAndDelete(req.params.id);
     if (!lesson) return res.status(404).json({ msg: 'Lesson not found' });

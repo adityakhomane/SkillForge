@@ -1,18 +1,23 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const auth = require('../middleware/auth');
-const progressController = require('../controllers/progressController');
+import { protect } from '../middleware/auth.js';
+import {
+  updateProgress,
+  getLessonProgress,
+  getCourseProgress,
+  getUserProgress
+} from '../controllers/progressController.js';
 
 // Update lesson progress
-router.post('/update', auth, progressController.updateProgress);
+router.post('/update', protect, updateProgress);
 
 // Get lesson progress
-router.get('/lesson/:lessonId', auth, progressController.getLessonProgress);
+router.get('/lesson/:lessonId', protect, getLessonProgress);
 
 // Get course progress
-router.get('/course/:courseId', auth, progressController.getCourseProgress);
+router.get('/course/:courseId', protect, getCourseProgress);
 
 // Get all user progress
-router.get('/user', auth, progressController.getUserProgress);
+router.get('/user', protect, getUserProgress);
 
-module.exports = router;
+export default router;

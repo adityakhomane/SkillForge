@@ -1,10 +1,18 @@
 import { configureStore } from '@reduxjs/toolkit';
-
-// Import reducers
 import authReducer from '../slices/authSlice';
+import courseReducer from '../slices/courseSlice';
 
-export const store = configureStore({
+const store = configureStore({
   reducer: {
     auth: authReducer,
+    course: courseReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST'],
+      },
+    }),
 });
+
+export { store };

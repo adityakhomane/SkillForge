@@ -1,112 +1,157 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { login, clearError } from '../../state/slices/authSlice';
 import { toast } from 'react-toastify';
-import { loginStart, loginSuccess, loginFailure } from '../../state/slices/authSlice';
-import authService from '../../services/authService';
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   });
-  
-  const { loading, error } = useSelector(state => state.auth);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading, error, isAuthenticated, user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    // If already authenticated, redirect based on role
+    if (isAuthenticated && user && user.role) {
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (user.role === 'student') {
+        navigate('/student/dashboard');
+      } else {
+        navigate('/');
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  useEffect(() => {
+    // Show error toast if there's an error
+    if (error) {
+      toast.error(error);
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (!formData.email || !formData.password) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
     try {
-      dispatch(loginStart());
-      
-      // This would be replaced with an actual API call
-      // For now, we'll simulate a successful login with mock data
-      const mockUserData = {
-        id: '1',
-        name: 'Test User',
-        email: formData.email,
-        role: 'student'
-      };
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Set auth token (in a real app, this would come from the API)
-      authService.setAuthToken('mock-jwt-token');
-      
-      dispatch(loginSuccess(mockUserData));
+      await dispatch(login(formData)).unwrap();
       toast.success('Login successful!');
-      navigate('/courses');
-    } catch (err) {
-      dispatch(loginFailure(err.message || 'Login failed'));
-      toast.error(err.message || 'Login failed');
+      // Redirection handled by useEffect
+    } catch (error) {
+      // Error is handled by the useEffect above
     }
   };
 
   return (
-    <div className="max-w-md mx-auto my-12 p-8 bg-white rounded-lg shadow-lg">
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Login to Your Account</h2>
-      
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
-          {error}
-        </div>
-      )}
-      
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
         <div>
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-            Email Address
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
-          />
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Sign in to your account
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Or{' '}
+            <Link
+              to="/register"
+              className="font-medium text-blue-600 hover:text-blue-500"
+            >
+              create a new account
+            </Link>
+          </p>
         </div>
-        
-        <div>
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-            Password
-          </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
-          />
-        </div>
-        
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-medium"
-          disabled={loading}
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
-      
-      <div className="mt-6 text-center">
-        <p className="text-gray-600">
-          Don't have an account? <Link to="/register" className="text-blue-600 hover:underline font-medium">Register here</Link>
-        </p>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <label htmlFor="email" className="sr-only">
+                Email address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                placeholder="Email address"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="text-sm">
+              <Link
+                to="/forgot-password"
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
+                Forgot your password?
+              </Link>
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Signing in...
+                </div>
+              ) : (
+                'Sign in'
+              )}
+            </button>
+          </div>
+
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Don't have an account?{' '}
+              <Link
+                to="/register"
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
+                Sign up here
+              </Link>
+            </p>
+          </div>
+        </form>
       </div>
     </div>
   );

@@ -1,10 +1,10 @@
-const LessonProgress = require('../Models/LessonProgress');
-const Course = require('../Models/Course');
-const Lesson = require('../Models/Lesson');
-const User = require('../Models/User');
+import LessonProgress from '../Models/LessonProgress.js';
+import Course from '../Models/Course.js';
+import Lesson from '../Models/Lesson.js';
+import User from '../Models/User.js';
 
 // Update lesson progress
-exports.updateProgress = async (req, res) => {
+export const updateProgress = async (req, res) => {
   try {
     const userId = req.user.id;
     const { lessonId, progress, currentTime, totalWatchTime } = req.body;
@@ -42,7 +42,7 @@ exports.updateProgress = async (req, res) => {
 };
 
 // Get lesson progress for a user
-exports.getLessonProgress = async (req, res) => {
+export const getLessonProgress = async (req, res) => {
   try {
     const userId = req.user.id;
     const { lessonId } = req.params;
@@ -56,7 +56,7 @@ exports.getLessonProgress = async (req, res) => {
 };
 
 // Get course progress for a user
-exports.getCourseProgress = async (req, res) => {
+export const getCourseProgress = async (req, res) => {
   try {
     const userId = req.user.id;
     const { courseId } = req.params;
@@ -87,7 +87,7 @@ exports.getCourseProgress = async (req, res) => {
 };
 
 // Get all user progress
-exports.getUserProgress = async (req, res) => {
+export const getUserProgress = async (req, res) => {
   try {
     const userId = req.user.id;
     

@@ -1,73 +1,50 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import './App.css';
-
-// Auth service
-import authService from './services/authService';
-
-// Common Components
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
-import NotFound from './components/common/NotFound';
-import ProtectedRoute from './components/common/ProtectedRoute';
-
-// Pages
+import ProtectedRoute from './routes/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
-import CourseList from './pages/student/CourseList';
+import Courses from './pages/student/Courses';
 import CourseDetail from './pages/student/CourseDetail';
 import Profile from './pages/student/Profile';
-import Dashboard from './pages/admin/Dashboard';
+import Certificate from './pages/student/Certificate';
+import AdminDashboard from './pages/AdminDashboard';
+import StudentDashboard from './pages/StudentDashboard';
 
 function App() {
-  const dispatch = useDispatch();
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    // Initialize auth state from localStorage
-    const authState = authService.initializeAuth();
-    if (authState.isAuthenticated) {
-      // Dispatch action to set user in Redux state
-      // This would be implemented in your authSlice
-    }
-  }, [dispatch]);
-
   return (
     <Router>
-      <div className="flex flex-col min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50">
         <Navbar />
-        <main className="flex-grow w-full">
+        <main className="container mx-auto px-4 py-8">
           <Routes>
-            {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            
-            {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/courses" element={<CourseList />} />
-              <Route path="/courses/:courseId" element={<CourseDetail />} />
-              <Route path="/profile" element={<Profile />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/courses/:id" element={<CourseDetail />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/certificates" element={<Certificate />} />
+
+            {/* Protected routes */}
+            <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
             </Route>
-            
-            {/* Admin Routes */}
-            <Route element={<ProtectedRoute requiredRole="admin" />}>
-              <Route path="/admin" element={<Dashboard />} />
+
+            <Route element={<ProtectedRoute allowedRoles={['student']} />}>
+              <Route path="/student/dashboard" element={<StudentDashboard />} />
             </Route>
-            
-            {/* 404 Route */}
-            <Route path="*" element={<NotFound />} />
+
+            {/* Keep old admin route for backward compatibility */}
+            <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </main>
         <Footer />
-        <ToastContainer position="bottom-right" />
-       </div>
-     </Router>
-  )
+      </div>
+    </Router>
+  );
 }
 
-export default App
+export default App;
