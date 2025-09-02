@@ -67,7 +67,6 @@ const certificateSchema = new mongoose.Schema({
 
 // Index for efficient queries
 certificateSchema.index({ userId: 1, courseId: 1 });
-certificateSchema.index({ certificateNumber: 1 });
 
 // Pre-save middleware to generate certificate number
 certificateSchema.pre('save', async function(next) {
